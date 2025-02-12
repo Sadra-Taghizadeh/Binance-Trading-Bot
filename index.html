@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظرسنجی معلم سال</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #f6f9ff 0%, #f0f5ff 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        color: #1a365d;
+    }
+
+    .poll {
+        width: 90%;
+        max-width: 800px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .poll .question {
+        padding: 30px;
+        color: #1a365d;
+        font-size: 24px;
+        font-weight: 700;
+        text-align: center;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        line-height: 1.4;
+    }
+
+    .poll .answers {
+        padding: 30px;
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .poll .answers .answer {
+        padding: 15px 20px;
+        cursor: pointer;
+        position: relative;
+        min-height: 100px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        background: #fff;
+    }
+
+    .poll .answers .answer:hover {
+        transform: translateY(-2px);
+        border-color: #90cdf4;
+        box-shadow: 0 5px 15px rgba(66, 153, 225, 0.1);
+    }
+
+    .poll .answers .answer.selected {
+        border: 2px solid #4299e1;
+        background: #ebf8ff;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(66, 153, 225, 0.2);
+    }
+
+    .poll .answers .answer .teacher-info {
+        display: flex;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        gap: 20px;
+    }
+
+    .poll .answers .answer .teacher-image {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .answer:hover .teacher-image {
+        transform: scale(1.05);
+    }
+
+    .poll .answers .answer .text-content {
+        flex: 1;
+    }
+
+    .poll .answers .answer .teacher-name {
+        font-weight: 600;
+        color: #2d3748;
+        display: block;
+        line-height: 1.4;
+        font-size: 18px;
+    }
+
+    .poll .answers .answer .subject {
+        font-size: 14px;
+        color: #718096;
+        display: block;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    /* .poll .answers .answer .percentage-value {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        color: #4a5568;
+        font-size: 16px;
+        font-weight: 600;
+        z-index: 1;
+        opacity: 0;
+        transition: all 0.5s ease;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 5px 10px;
+        border-radius: 20px;
+    } */
+
+    .poll .answers .answer .percentage-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        opacity: 0;
+        z-index: 0;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .poll.show-results .answer .percentage-value,
+    .poll.show-results .answer .percentage-bar {
+        opacity: 1;
+    }
+
+    .poll .footer {
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 14px;
+        color: #718096;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        font-weight: 500;
+    }
+
+
+     .poll-footer {
+        padding: 20px 30px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .selection-counter {
+        font-size: 14px;
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    .submit-button {
+        background: #4299e1;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .submit-button.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .submit-button.active:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+    }
+
+    .error-message {
+        color: #e53e3e;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        margin-top: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .error-message.show {
+        opacity: 1;
+    }
+
+    /* Toast notification styles */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: #2d3748;
+        color: white;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .poll {
+            width: 95%;
+            margin: 15px;
+        }
+
+        .poll .question {
+            font-size: 20px;
+            padding: 25px 20px;
+        }
+
+        .poll .answers {
+            padding: 20px;
+            grid-template-columns: 1fr;
+        }
+
+        .poll .answers .answer {
+            min-height: 90px;
+        }
+
+        .poll .answers .answer .teacher-image {
+            width: 60px;
+            height: 60px;
+        }
+
+        .poll .answers .answer .teacher-name {
+            font-size: 16px;
+        }
+
+        .poll .answers .answer .subject {
+            font-size: 13px;
+        }
+
+        .poll .answers .answer .percentage-value {
+            font-size: 14px;
+            top: 10px;
+            right: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        body {
+            padding: 10px;
+        }
+
+        .poll {
+            width: 100%;
+            margin: 0;
+        }
+
+        .poll .answers .answer {
+            padding: 12px 15px;
+        }
+
+        .poll .answers .answer .teacher-image {
+            width: 50px;
+            height: 50px;
+        }
+    }
+
+    /* Animation for selection */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    .poll .answers .answer.selected {
+        animation: pulse 0.3s ease-in-out;
+    }
+</style>
+<body>
+    <body>
+    <div class="poll">
+        <div class="question"></div>
+        <div class="answers"></div>
+        <div class="poll-footer">
+            <div class="selection-counter">1-3 معلم انتخاب کنید (0 انتخاب شده)</div>
+            <div class="error-message">لطفاً بین 1 تا 3 معلم انتخاب کنید</div>
+            <button class="submit-button">ثبت رأی</button>
+        </div>
+    </div>
+    <div class="toast">رأی شما با موفقیت ثبت شد!</div>
+
+
+    <script>
+        const poll = {
+            question: 'معلم مورد علاقه شما در این سال کیست؟',
+            answers: [
+                {
+                    name: 'خانم جانسون',
+                    subject: 'ریاضیات',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'آقای اسمیت',
+                    subject: 'علوم',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'خانم دیویس',
+                    subject: 'ادبیات انگلیسی',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'آقای ویلسون',
+                    subject: 'تاریخ و مطالعات اجتماعی',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'خانم رودریگز',
+                    subject: 'هنر و طراحی',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'آقای براون',
+                    subject: 'تربیت بدنی',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'خانم تامپسون',
+                    subject: 'موسیقی و اجرا',
+                    image: '/api/placeholder/70/70'
+                },
+                {
+                    name: 'دکتر لی',
+                    subject: 'علوم کامپیوتر',
+                    image: '/api/placeholder/70/70'
+                }
+            ],
+             pollCount: 45,
+            answersWeight: [8, 7, 6, 5, 5, 4, 5, 5],
+            selectedAnswers: new Set(),
+            hasVoted: false,
+            maxSelections: 3,
+            minSelections: 1
+        };
+
+         const pollDOM = {
+            question: document.querySelector('.poll .question'),
+            answers: document.querySelector('.poll .answers'),
+            submitButton: document.querySelector('.submit-button'),
+            selectionCounter: document.querySelector('.selection-counter'),
+            errorMessage: document.querySelector('.error-message'),
+            toast: document.querySelector('.toast')
+        };
+
+        function initialize() {
+            pollDOM.question.textContent = poll.question;
+
+            pollDOM.answers.innerHTML = poll.answers.map((answer, i) => `
+                <div class="answer" data-index="${i}">
+                    <div class="teacher-info">
+                        <img src="${answer.image}" alt="${answer.name}" class="teacher-image">
+                        <div class="text-content">
+                            <span class="teacher-name">${answer.name}</span>
+                            <span class="subject">${answer.subject}</span>
+                        </div>
+                    </div>
+                    <div class="percentage-bar"></div>
+                    <!-- <span class="percentage-value">0%</span> -->
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.poll .answers .answer').forEach(answer => {
+                answer.addEventListener('click', () => toggleAnswer(answer.dataset.index));
+            });
+
+            pollDOM.submitButton.addEventListener('click', submitVotes);
+        }
+
+        function toggleAnswer(index) {
+            const answerElement = document.querySelectorAll('.poll .answers .answer')[index];
+            
+            if (poll.selectedAnswers.has(index)) {
+                // Remove selection
+                poll.selectedAnswers.delete(index);
+                answerElement.classList.remove('selected');
+            } else if (poll.selectedAnswers.size < poll.maxSelections) {
+                // Add selection
+                poll.selectedAnswers.add(index);
+                answerElement.classList.add('selected');
+            }
+
+            updateSelectionCounter();
+            validateSelections();
+        }
+
+        function updateSelectionCounter() {
+            pollDOM.selectionCounter.textContent = 
+                `1-3 معلم انتخاب کنید (${poll.selectedAnswers.size} انتخاب شده)`;
+        }
+
+        function validateSelections() {
+            const isValid = poll.selectedAnswers.size >= poll.minSelections && 
+                          poll.selectedAnswers.size <= poll.maxSelections;
+            
+            pollDOM.submitButton.classList.toggle('active', isValid);
+            pollDOM.errorMessage.classList.toggle('show', !isValid && poll.selectedAnswers.size > 0);
+        }
+
+        function submitVotes() {
+            if (poll.selectedAnswers.size < poll.minSelections || 
+                poll.selectedAnswers.size > poll.maxSelections) {
+                return;
+            }
+
+            // Update vote counts
+            poll.selectedAnswers.forEach(index => {
+                poll.answersWeight[index]++;
+                poll.pollCount++;
+            });
+
+            // Show results
+            document.querySelector('.poll').classList.add('show-results');
+            showResults();
+
+            // Show success message
+            pollDOM.toast.classList.add('show');
+            setTimeout(() => {
+                pollDOM.toast.classList.remove('show');
+            }, 3000);
+
+            // Disable further voting
+            poll.hasVoted = true;
+            pollDOM.submitButton.disabled = true;
+            pollDOM.submitButton.textContent = 'رأی ثبت شد';
+            pollDOM.submitButton.classList.remove('active');
+
+            // Here you would typically send the data to your server
+            console.log('Votes submitted for teachers:', 
+                Array.from(poll.selectedAnswers).map(index => poll.answers[index].name));
+        }
+
+        function showResults() {
+            const answers = document.querySelectorAll('.poll .answers .answer');
+            
+            answers.forEach((answer, i) => {
+                const percentage = Math.round((poll.answersWeight[i] * 100) / poll.pollCount);
+                const percentageBar = answer.querySelector('.percentage-bar');
+                const percentageValue = answer.querySelector('.percentage-value');
+                
+                percentageBar.style.width = `${percentage}%`;
+                // percentageValue.textContent = `${percentage}%`;
+            });
+        }
+
+        // Initialize the poll
+        initialize();
+    </script>
+</body>
+</html>
